@@ -12,7 +12,8 @@
         <div class="col-md-5">
             <div class="card p-4 shadow">
                 <h3 class="text-center">Login</h3>
-                <form action="../actions/login_action.php" method="POST">
+                    <form method="POST" action="../actions/login_action.php">
+
 
                     <div class="mb-3">
                         <label>Email</label>

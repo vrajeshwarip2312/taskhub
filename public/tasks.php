@@ -46,11 +46,11 @@ $result = $stmt->get_result();
 
         <?php else: ?>
             
-            <?php $sl = 1; ?> <!-- ⭐ SERIAL STARTS HERE -->
+            <?php $sl = 1; ?>
 
             <?php while($row = $result->fetch_assoc()): ?>
                 <tr>
-                    <td><?= $sl++ ?></td> <!-- ⭐ USER-WISE SERIAL NUMBER -->
+                    <td><?= $sl++ ?></td>
 
                     <td><?= htmlspecialchars($row['title']) ?></td>
 
@@ -81,11 +81,11 @@ $result = $stmt->get_result();
                         <a href="view_task.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-info">View</a>
                         <a href="edit_task.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
 
-                        <a href="../actions/delete_task.php?id=<?= $row['id'] ?>" 
-                           class="btn btn-sm btn-danger btn-delete"
-                           data-id="<?= $row['id'] ?>">
-                           Delete
-                        </a>
+                        <button 
+                            class="btn btn-sm btn-danger btn-delete"
+                            data-id="<?= $row['id'] ?>">
+                            Delete
+                        </button>
                     </td>
                 </tr>
             <?php endwhile; ?>
@@ -97,6 +97,7 @@ $result = $stmt->get_result();
 
 <?php include __DIR__ . '/footer.php'; ?>
 
+
 <!-- NOTIFICATION FUNCTION -->
 <script>
 function showNotification(type, message){
@@ -104,27 +105,32 @@ function showNotification(type, message){
     box.className = "notify " + type;
     box.innerText = message;
     document.body.appendChild(box);
-
     setTimeout(()=> box.remove(), 2500);
 }
 </script>
 
-<!-- DELETE NOTIFICATION -->
+
+<!-- DELETE TASK AJAX -->
 <script>
 $(".btn-delete").on("click", function(e){
+    e.preventDefault();
+
     const id = $(this).data("id");
 
-    if(!confirm("Delete this task?")) return false;
+    if(!confirm("Delete this task?")) return;
 
     $.post("/taskhub/actions/delete_task.php", { id:id }, function(res){
+
         if(res.trim() === "success"){
             showNotification("error", "Task Deleted");
-            setTimeout(()=> location.reload(), 600);
-        } else {
-            showNotification("error", "Failed to delete task");
+            setTimeout(()=> location.reload(), 700);
+        } 
+        else {
+            showNotification("error", "Delete failed!");
+            console.log(res);
         }
+
     });
 
-    return false;
 });
 </script>

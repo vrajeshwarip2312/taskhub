@@ -1,51 +1,46 @@
 <?php
 // actions/add_comment.php
-include "../config/auth_check.php";
-include "../config/db.php";
-include "create_notification.php"; // defines create_notification()
+session_start();
+require_once __DIR__ . '/../config/db.php';
 
-header('Content-Type: application/json');
-
-$task_id = isset($_POST['task_id']) ? (int)$_POST['task_id'] : 0;
-$comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
-
-if ($task_id <= 0 || $comment === '') {
-    echo json_encode(['success' => false, 'error' => 'Invalid input']);
+// Only accept POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['status'=>'error','msg'=>'invalid_method']);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+// Check user session
+$user_id = $_SESSION['user_id'] ?? 0;
+if ($user_id <= 0) {
+    http_response_code(401);
+    echo json_encode(['status'=>'error','msg'=>'not_authenticated']);
+    exit;
+}
 
-// Insert comment
-$stmt = $conn->prepare("INSERT INTO comments (task_id, user_id, comment) VALUES (?, ?, ?)");
-$stmt->bind_param("iis", $task_id, $user_id, $comment);
+// Validate inputs
+$task_id = isset($_POST['task_id']) ? intval($_POST['task_id']) : 0;
+$comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 
-if ($stmt->execute()) {
-    $comment_id = $conn->insert_id;
+if ($task_id <= 0 || $comment === '') {
+    http_response_code(400);
+    echo json_encode(['status'=>'error','msg'=>'missing_fields']);
+    exit;
+}
 
-    // Notify the assigned user and task creator (if different)
-    $tstmt = $conn->prepare("SELECT created_by, assigned_to, title FROM tasks WHERE id = ?");
-    $tstmt->bind_param("i", $task_id);
-    $tstmt->execute();
-    $tres = $tstmt->get_result();
-    if ($trow = $tres->fetch_assoc()) {
-        $title = $trow['title'];
-        $creator = (int)$trow['created_by'];
-        $assigned = (int)$trow['assigned_to'];
+// Insert comment (prepared stmt)
+$stmt = $conn->prepare("INSERT INTO comments (task_id, user_id, comment, created_at) VALUES (?, ?, ?, NOW())");
+if (!$stmt) {
+    http_response_code(500);
+    echo json_encode(['status'=>'error','msg'=>'db_prepare_failed']);
+    exit;
+}
+$stmt->bind_param('iis', $task_id, $user_id, $comment);
+$ok = $stmt->execute();
 
-        $msg = $_SESSION['name'] . " commented on task: " . $title;
-
-        // Notify assigned user (if exists and not the commenter)
-        if ($assigned && $assigned !== $user_id) {
-            create_notification($conn, $assigned, $msg);
-        }
-        // Notify creator if different and not commenter
-        if ($creator && $creator !== $user_id && $creator !== $assigned) {
-            create_notification($conn, $creator, $msg);
-        }
-    }
-
-    echo json_encode(['success' => true, 'comment_id' => $comment_id]);
+if ($ok) {
+    echo json_encode(['status'=>'ok','msg'=>'success']);
 } else {
-    echo json_encode(['success' => false, 'error' => $stmt->error]);
+    http_response_code(500);
+    echo json_encode(['status'=>'error','msg'=>'db_error']);
 }

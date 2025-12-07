@@ -6,7 +6,7 @@ $title = trim($_POST['title']);
 $desc  = trim($_POST['description']);
 $priority = $_POST['priority'];
 $due = $_POST['due_date'];
-$status = "Pending"; // 👈 DEFAULT STATUS
+$status = "Pending"; 
 $created_by = $_SESSION['user_id'];
 
 $q = $conn->prepare("INSERT INTO tasks(title, description, priority, status, due_date, created_by) 

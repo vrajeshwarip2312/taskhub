@@ -10,10 +10,10 @@ $id       = $_POST['id'];
 $title    = $_POST['title'];
 $desc     = $_POST['description'];
 $priority = $_POST['priority'];
-$status   = $_POST['status'];       // 👍 status added
+$status   = $_POST['status'];       
 $due_date = $_POST['due_date'];
 
-// UPDATE TASK
+//update task
 $stmt = $conn->prepare("
     UPDATE tasks 
     SET title=?, description=?, priority=?, status=?, due_date=?
@@ -23,7 +23,7 @@ $stmt->bind_param("sssssi", $title, $desc, $priority, $status, $due_date, $id);
 
 if ($stmt->execute()) {
 
-    // 🔔 Create Notification
+    // Create notification
     $msg = "Task updated: $title";
     $uid = $_SESSION["user_id"];
 

@@ -9,7 +9,6 @@ if ($task_id <= 0) {
     exit;
 }
 
-// join with users to show name
 $stmt = $conn->prepare("
     SELECT c.id, c.comment, c.created_at, c.user_id, u.name AS user_name
     FROM comments c

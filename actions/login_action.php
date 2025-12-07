@@ -2,7 +2,6 @@
 session_start();
 include "../config/db.php";
 
-// ====== IMPORTANT: Prevent direct access ======
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: ../public/login.php");
     exit;
@@ -12,7 +11,7 @@ if (!isset($_POST['email']) || !isset($_POST['password'])) {
     header("Location: ../public/login.php?error=missing_fields");
     exit;
 }
-// ==============================================
+
 
 $email = trim($_POST['email']);
 $pass  = trim($_POST['password']);

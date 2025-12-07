@@ -3,14 +3,13 @@
 session_start();
 require_once __DIR__ . '/../config/db.php';
 
-// Only accept POST
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['status'=>'error','msg'=>'invalid_method']);
     exit;
 }
 
-// Check user session
 $user_id = $_SESSION['user_id'] ?? 0;
 if ($user_id <= 0) {
     http_response_code(401);
@@ -18,7 +17,7 @@ if ($user_id <= 0) {
     exit;
 }
 
-// Validate inputs
+
 $task_id = isset($_POST['task_id']) ? intval($_POST['task_id']) : 0;
 $comment = isset($_POST['comment']) ? trim($_POST['comment']) : '';
 
@@ -28,7 +27,7 @@ if ($task_id <= 0 || $comment === '') {
     exit;
 }
 
-// Insert comment (prepared stmt)
+// Insert comment 
 $stmt = $conn->prepare("INSERT INTO comments (task_id, user_id, comment, created_at) VALUES (?, ?, ?, NOW())");
 if (!$stmt) {
     http_response_code(500);

@@ -17,10 +17,10 @@ require_once "../config/auth_check.php";
 
     <h2>Create New Task</h2>
 
-    <!-- Correct action file -->
+
     <form action="../actions/add_task_action.php" method="POST">
 
-        <!-- DEFAULT STATUS -->
+  
         <input type="hidden" name="status" value="Pending">
 
         <div class="mb-3">

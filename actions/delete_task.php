@@ -2,7 +2,7 @@
 require_once "../config/auth_check.php";
 require_once "../config/db.php";
 
-// POST check
+
 if (!isset($_POST['id'])) {
     echo "error";
     exit;
@@ -10,7 +10,7 @@ if (!isset($_POST['id'])) {
 
 $id = $_POST['id'];
 
-// Get task title (for notification)
+
 $q = $conn->prepare("SELECT title FROM tasks WHERE id=? LIMIT 1");
 $q->bind_param("i", $id);
 $q->execute();

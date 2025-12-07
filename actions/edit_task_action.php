@@ -13,7 +13,6 @@ $priority = $_POST['priority'];
 $status   = $_POST['status'];
 $due      = $_POST['due_date'];
 
-// 👉 UPDATE Task
 $q = $conn->prepare("UPDATE tasks 
                      SET title=?, description=?, priority=?, status=?, due_date=?
                      WHERE id=?");
@@ -21,7 +20,6 @@ $q->bind_param("sssssi", $title, $desc, $priority, $status, $due, $id);
 
 if ($q->execute()) {
 
-    // 👉 INSERT NOTIFICATION
     $uid = $_SESSION["user_id"];
     $msg = "Task updated: $title (Status: $status)";
 

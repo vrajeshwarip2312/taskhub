@@ -34,13 +34,11 @@ if (!$t) {
 
 <hr>
 
-<!-- ===================== COMMENTS SECTION ===================== -->
 <div class="card mt-4">
   <div class="card-body">
 
     <h5>Comments</h5>
 
-    <!-- Comments List -->
     <div id="commentsList" class="mb-3">Loading comments...</div>
 
     <!-- Add Comment Form -->
@@ -58,18 +56,17 @@ if (!$t) {
   </div>
 </div>
 
-</div> <!-- container end -->
+</div> 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
 const TASK_ID = <?= $task_id ?>;
 
-// Escape HTML
+
 function escapeHtml(text) {
     return $('<div/>').text(text).html();
 }
 
-// Render comments to HTML
 function renderComments(list) {
     if (!list || list.length === 0) {
         $('#commentsList').html('<div class="text-muted">No comments yet.</div>');
@@ -92,7 +89,7 @@ function renderComments(list) {
     $("#commentsList").html(html);
 }
 
-// Load comments from backend
+
 function loadComments() {
     $.getJSON("/taskhub/actions/fetch_comments.php", { task_id: TASK_ID })
         .done(data => renderComments(data))
@@ -157,7 +154,7 @@ $(document).on("click", ".edit-btn", function() {
     "json");
 });
 
-// Initial load
+
 loadComments();
 </script>
 

@@ -17,7 +17,7 @@ $t->bind_param("i", $task_id);
 $t->execute();
 $title = $t->get_result()->fetch_assoc()['title'];
 
-// notification to assigned user
+
 $message = "You have been assigned a new task: '$title'";
 
 $n = $conn->prepare("INSERT INTO notifications(user_id, message) VALUES (?, ?)");

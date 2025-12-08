@@ -97,8 +97,6 @@ $result = $stmt->get_result();
 
 <?php include __DIR__ . '/footer.php'; ?>
 
-
-<!-- NOTIFICATION FUNCTION -->
 <script>
 function showNotification(type, message){
     const box = document.createElement("div");

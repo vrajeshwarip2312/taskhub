@@ -41,7 +41,7 @@ if (!$t) {
 
     <div id="commentsList" class="mb-3">Loading comments...</div>
 
-    <!-- Add Comment Form -->
+
     <form id="commentForm">
       <div class="mb-2">
         <textarea id="commentText" name="comment" class="form-control" 

@@ -1,10 +1,10 @@
-<?php
+<?php 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 ?>
 
-<!-- jQuery FIRST -->
+<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- Bootstrap CSS -->
@@ -13,28 +13,34 @@ if (session_status() == PHP_SESSION_NONE) {
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Notification CSS -->
 <style>
-.notify {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 18px;
-    color: white;
-    border-radius: 8px;
+.dropdown-user { position: relative; cursor:pointer; }
+.dropdown-menu-user {
+    display: none;
+    position: absolute;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    min-width: 150px;
+    padding: 5px 0;
     z-index: 99999;
-    opacity: 0.95;
-    font-size: 14px;
 }
-.notify.success { background: #28a745; }
-.notify.error { background: #dc3545; }
-.notify.info { background: #0dcaf0; }
+.dropdown-user:hover .dropdown-menu-user { display: block; }
+
+.user-avatar {
+    width:35px;
+    height:35px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-right:5px;
+    border:2px solid #fff;
+}
 </style>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container-fluid">
 
-    <a class="navbar-brand" href="/taskhub/public/dashboard.php">TaskHub</a>
+    <a class="navbar-brand" href="dashboard.php">TaskHub</a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
@@ -42,16 +48,24 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <div class="collapse navbar-collapse" id="navbarNav">
 
+      
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/taskhub/public/tasks.php">Tasks</a>
+          <a class="nav-link" href="tasks.php">Tasks</a>
         </li>
+
+        <?php if ($_SESSION['role'] === 'admin'): ?>
+        <li class="nav-item">
+          <a class="nav-link" href="manage_user.php">Manage Users</a>
+        </li>
+        <?php endif; ?>
       </ul>
 
+      <!-- RIGHT SIDE -->
       <div class="d-flex align-items-center">
 
-        <!-- Notifications -->
-        <div class="dropdown me-3">
+        <!-- NOTIFICATIONS -->
+        <div class="dropdown me-4">
           <a class="nav-link dropdown-toggle text-white" href="#" id="notifDropdown" data-bs-toggle="dropdown">
             Notifications <span id="notifCount" class="badge bg-danger">0</span>
           </a>
@@ -59,23 +73,33 @@ if (session_status() == PHP_SESSION_NONE) {
           <ul class="dropdown-menu dropdown-menu-end p-2" style="min-width:300px;">
             <div id="notifList">Loading...</div>
             <div class="text-center mt-2">
-              <a href="/taskhub/public/notifications.php">View all</a>
+              <a href="notifications.php">View all</a>
             </div>
           </ul>
         </div>
 
-        <span class="text-white me-3"><?= htmlspecialchars($_SESSION['name']) ?></span>
-        <a href="/taskhub/actions/logout.php" class="btn btn-sm btn-danger">Logout</a>
+        <!-- USER MENU -->
+        <div class="dropdown-user d-flex align-items-center">
+
+          <!-- Profile Picture -->
+          <img src="uploads/avatars/<?= htmlspecialchars($_SESSION['avatar'] ?? 'default.png'); ?>" 
+               class="user-avatar" alt="User Avatar">
+
+          <span class="text-white me-2"><?= htmlspecialchars($_SESSION['name']); ?></span>
+
+          <div class="dropdown-menu-user">
+            <a class="dropdown-item" href="profile.php">My Profile</a>
+            <a class="dropdown-item" href="../actions/logout.php">Logout</a>
+          </div>
+        </div>
 
       </div>
+
     </div>
 
   </div>
 </nav>
-
-
 <script>
-/* LOAD NOTIFICATIONS */
 function loadNotifs(){
   $.getJSON("/taskhub/actions/fetch_notifications.php", function(data){
     let html = '';
@@ -89,9 +113,7 @@ function loadNotifs(){
         html += `<div class="dropdown-item">
           <div class="small text-muted">${n.created_at}</div>
           <div>${n.message}</div>
-          <div class="text-end">
-            <button class="btn btn-sm btn-link mark-read" data-id="${n.id}">Mark read</button>
-          </div>
+          <button class="btn btn-sm btn-link mark-read" data-id="${n.id}">Mark read</button>
         </div>`;
       });
     }
@@ -101,18 +123,13 @@ function loadNotifs(){
   });
 }
 
-/* MARK READ */
-$(document).on("click", ".mark-read", function(e){
-  e.preventDefault();
-  const id = $(this).data('id');
-
+$(document).on("click",".mark-read",function(){
   $.post("/taskhub/actions/mark_notification_read.php",
-    { id: id },
-    function(){ loadNotifs(); },
-    'json'
+    { id: $(this).data('id') },
+    ()=> loadNotifs()
   );
 });
 
 loadNotifs();
-setInterval(loadNotifs, 20000);
+setInterval(loadNotifs,20000);
 </script>

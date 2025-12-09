@@ -6,24 +6,29 @@ if (!isset($_POST['id'])) {
     die("Invalid Request");
 }
 
-$id       = $_POST['id'];
-$title    = $_POST['title'];
-$desc     = $_POST['description'];
-$priority = $_POST['priority'];
-$status   = $_POST['status'];
-$due      = $_POST['due_date'];
+$id          = $_POST['id'];
+$title       = $_POST['title'];
+$desc        = $_POST['description'];
+$priority    = $_POST['priority'];
+$status      = $_POST['status'];
+$due         = $_POST['due_date'];
+$assigned_to = !empty($_POST['assigned_to']) ? $_POST['assigned_to'] : NULL;
 
-$q = $conn->prepare("UPDATE tasks 
-                     SET title=?, description=?, priority=?, status=?, due_date=?
-                     WHERE id=?");
-$q->bind_param("sssssi", $title, $desc, $priority, $status, $due, $id);
+$q = $conn->prepare("
+    UPDATE tasks 
+    SET title=?, description=?, priority=?, status=?, due_date=?, assigned_to=?
+    WHERE id=?
+");
+
+$q->bind_param("sssssii", $title, $desc, $priority, $status, $due, $assigned_to, $id);
 
 if ($q->execute()) {
 
+    // Add notification
     $uid = $_SESSION["user_id"];
     $msg = "Task updated: $title (Status: $status)";
 
-    $n = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?,?)");
+    $n = $conn->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
     $n->bind_param("is", $uid, $msg);
     $n->execute();
 
@@ -32,4 +37,3 @@ if ($q->execute()) {
 }
 
 echo "Error updating record: " . $q->error;
-?>

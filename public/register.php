@@ -12,6 +12,7 @@
     <div class="col-md-4 mx-auto card p-4">
         <h3 class="text-center">Register</h3>
         <form action="../actions/register_action.php" method="POST">
+            
             <input class="form-control mb-2" name="name" placeholder="Name" required>
             <input class="form-control mb-2" name="email" placeholder="Email" required>
             <input class="form-control mb-2" name="password" placeholder="Password" required>

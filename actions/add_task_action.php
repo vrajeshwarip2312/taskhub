@@ -2,18 +2,34 @@
 session_start();
 require "../config/db.php";
 
-$title = trim($_POST['title']);
-$desc  = trim($_POST['description']);
-$priority = $_POST['priority'];
-$due = $_POST['due_date'];
-$status = "Pending"; 
-$created_by = $_SESSION['user_id'];
+require_once "../config/auth_check.php";
+requireLogin();
 
-$q = $conn->prepare("INSERT INTO tasks(title, description, priority, status, due_date, created_by) 
-                     VALUES(?,?,?,?,?,?)");
+$title       = trim($_POST['title']);
+$description = trim($_POST['description']);
+$priority    = $_POST['priority'];
+$due_date    = $_POST['due_date'];
+$status      = "Pending";
+$created_by  = $_SESSION['user_id'];
 
-$q->bind_param("sssssi", $title, $desc, $priority, $status, $due, $created_by);
-$q->execute();
+$assigned_to = !empty($_POST['assigned_to']) ? intval($_POST['assigned_to']) : null;
+
+$sql = "INSERT INTO tasks (title, description, priority, due_date, status, created_by, assigned_to)
+        VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("sssssis",
+    $title,
+    $description,
+    $priority,
+    $due_date,
+    $status,
+    $created_by,
+    $assigned_to
+);
+
+$stmt->execute();
 
 header("Location: ../public/tasks.php");
+exit;
 ?>

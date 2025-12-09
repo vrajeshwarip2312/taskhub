@@ -3,17 +3,21 @@
 <?php include "header.php"; ?>
 
 <?php
+// Get task details
 $id = $_GET['id'];
 $q = $conn->prepare("SELECT * FROM tasks WHERE id=?");
 $q->bind_param("i", $id);
 $q->execute();
 $t = $q->get_result()->fetch_assoc();
+
+// Fetch users for Assigned To dropdown
+$users = $conn->query("SELECT id, name FROM users");
 ?>
 
 <div class="container mt-4">
     <h3>Edit Task</h3>
 
-    <form method="POST" action="../actions/update_task.php">
+    <form method="POST" action="../actions/edit_task_action.php">
         <input type="hidden" name="id" value="<?= $t['id'] ?>">
 
         <label>Title</label>
@@ -38,6 +42,18 @@ $t = $q->get_result()->fetch_assoc();
 
         <label>Due Date</label>
         <input type="date" name="due_date" value="<?= $t['due_date'] ?>" class="form-control">
+
+        <label>Assigned To</label>
+        <select name="assigned_to" class="form-control">
+            <option value="">-- Unassigned --</option>
+
+            <?php while ($u = $users->fetch_assoc()) { ?>
+                <option value="<?= $u['id'] ?>" 
+                    <?= ($t['assigned_to'] == $u['id']) ? "selected" : "" ?>>
+                    <?= $u['name'] ?>
+                </option>
+            <?php } ?>
+        </select>
 
         <button class="btn btn-primary mt-3">Update</button>
         <a class="btn btn-secondary mt-3" href="tasks.php">Cancel</a>
